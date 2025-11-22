@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { login } from "@/app/auth/actions"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,17 +26,17 @@ export default function LoginPage() {
         setIsLoading(true)
 
         try {
-            const result = await signIn("credentials", {
-                email,
-                password,
-                redirect: false,
-            })
+            const formData = new FormData()
+            formData.append('email', email)
+            formData.append('password', password)
+
+            const result = await login(formData)
 
             if (result?.error) {
-                toast.error("Invalid credentials")
+                toast.error(result.error)
             } else {
                 toast.success("Welcome back!")
-                router.push("/dashboard")
+                // Redirect handled by server action
             }
         } catch (error) {
             toast.error("Something went wrong")
@@ -45,10 +45,11 @@ export default function LoginPage() {
         }
     }
 
-    const handleLinkedInSignIn = async () => {
-        setIsLoading(true)
-        await signIn("linkedin", { callbackUrl: "/dashboard" })
-    }
+    // LinkedIn auth deferred
+    // const handleLinkedInSignIn = async () => {
+    //     setIsLoading(true)
+    //     // await signIn("linkedin", { callbackUrl: "/dashboard" })
+    // }
 
     return (
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-10">
@@ -63,7 +64,7 @@ export default function LoginPage() {
                         <CardDescription>Sign in to your FinalRound account</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {hasLinkedIn && (
+                        {/* {hasLinkedIn && (
                             <>
                                 <Button
                                     variant="outline"
@@ -86,7 +87,7 @@ export default function LoginPage() {
                                     </div>
                                 </div>
                             </>
-                        )}
+                        )} */}
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">

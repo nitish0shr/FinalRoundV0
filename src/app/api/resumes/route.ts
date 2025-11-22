@@ -1,34 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
+import { apiLimiter, getClientIp } from '@/lib/rate-limit'
+import { createClient } from '@/lib/supabase/server'
 import { ResumeStore } from '@/lib/data-store'
-import type { GapAnalysis } from '@/types/job'
+import { createResumeSchema } from '@/lib/schemas'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
-    try {
-        const session = await auth()
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-        if (!session?.user?.email) {
+    if (authError || !user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    try {
+        // Rate limiting
+        const ip = getClientIp(request)
+        const identifier = user.email || ip
+        const { success, limit, remaining, reset } = apiLimiter.check(20, identifier)
+
+        if (!success) {
             return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
+                { error: 'Too many requests. Please try again later.' },
+                {
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Limit': limit.toString(),
+                        'X-RateLimit-Remaining': '0',
+                        'X-RateLimit-Reset': reset.toString(),
+                    }
+                }
             )
         }
 
         const body = await request.json()
-        const { jobId, resumeText, gapAnalysis } = body
 
-        if (!resumeText) {
-            return NextResponse.json(
-                { error: 'Resume text is required' },
-                { status: 400 }
-            )
-        }
+        // Validate request body
+        const validatedData = createResumeSchema.parse(body)
 
         const resume = ResumeStore.createResume({
-            userId: session.user.email,
-            jobId: jobId || undefined,
-            resumeText,
-            gapAnalysis: gapAnalysis || undefined
+            userId: user.id,
+            jobId: validatedData.jobId,
+            resumeText: validatedData.resumeText,
+            gapAnalysis: validatedData.gapAnalysis
         })
 
         return NextResponse.json({
@@ -37,6 +51,17 @@ export async function POST(request: NextRequest) {
         })
     } catch (error) {
         console.error('Create resume error:', error)
+
+        if (error instanceof z.ZodError) {
+            return NextResponse.json(
+                {
+                    error: 'Invalid request data',
+                    details: error.issues
+                },
+                { status: 400 }
+            )
+        }
+
         return NextResponse.json(
             { error: 'Failed to save resume' },
             { status: 500 }
@@ -45,22 +70,20 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     try {
-        const session = await auth()
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            )
-        }
-
         const { searchParams } = new URL(request.url)
         const jobId = searchParams.get('jobId')
 
         const resumes = jobId
             ? ResumeStore.getResumesByJobId(jobId)
-            : ResumeStore.getResumesByUserId(session.user.email)
+            : ResumeStore.getResumesByUserId(user.id)
 
         return NextResponse.json({
             success: true,

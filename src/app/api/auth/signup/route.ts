@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { hash } from 'bcryptjs'
+import { userStore } from '@/lib/user-store'
 import { z } from 'zod'
+import { authLimiter, getClientIp } from '@/lib/rate-limit'
 
 const signupSchema = z.object({
     name: z.string().min(2),
@@ -11,27 +11,28 @@ const signupSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json()
-        const { name, email, password } = signupSchema.parse(body)
+        // Rate limiting: 5 signups per 15 minutes per IP
+        const ip = getClientIp(request)
+        const { success, limit, remaining, reset } = authLimiter.check(5, ip)
 
-        // Check if user already exists
-        const existingUser = await db.user.findByEmail(email)
-        if (existingUser) {
+        if (!success) {
             return NextResponse.json(
-                { error: 'User already exists' },
-                { status: 400 }
+                { 
+                    error: 'Too many signup attempts. Please try again later.',
+                    limit,
+                    remaining: 0,
+                    reset,
+                },
+                { status: 429 }
             )
         }
 
-        // Hash password
-        const hashedPassword = await hash(password, 10)
+        const body = await request.json()
+        const { name, email, password } = signupSchema.parse(body)
 
-        // Create user
-        const user = await db.user.create({
-            name,
-            email,
-            password_hash: hashedPassword,
-        })
+        // Create user using userStore (in-memory)
+        // This matches the auth.ts credentials provider which also uses userStore
+        const user = await userStore.createUser(name, email, password)
 
         return NextResponse.json({
             user: {
@@ -45,6 +46,13 @@ export async function POST(request: NextRequest) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
                 { error: 'Invalid input data' },
+                { status: 400 }
+            )
+        }
+        // Handle duplicate email error
+        if (error.message?.includes('already exists')) {
+            return NextResponse.json(
+                { error: 'User already exists with this email' },
                 { status: 400 }
             )
         }

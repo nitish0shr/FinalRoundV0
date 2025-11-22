@@ -1,9 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 import { parseJobDescription } from '@/lib/openai'
+import { createClient } from '@/lib/supabase/server'
+import { aiLimiter, getClientIp } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
     try {
+        // Check authentication
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        // Rate limiting: 3 requests per minute (lower than text parsing)
+        const ip = getClientIp(request)
+        const identifier = user.email || ip
+        const { success, limit, remaining, reset } = aiLimiter.check(3, identifier)
+
+        if (!success) {
+            return NextResponse.json(
+                {
+                    error: 'Rate limit exceeded. Please try again in a minute.',
+                    limit,
+                    remaining: 0,
+                    reset,
+                },
+                {
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Limit': limit.toString(),
+                        'X-RateLimit-Remaining': '0',
+                        'X-RateLimit-Reset': reset.toString(),
+                    }
+                }
+            )
+        }
+
         const { url } = await request.json()
 
         if (!url || typeof url !== 'string') {
@@ -59,7 +93,14 @@ export async function POST(request: NextRequest) {
         // Parse the extracted text
         const parsed = await parseJobDescription(cleanedText)
 
-        return NextResponse.json({ success: true, data: parsed })
+        const result = NextResponse.json({ success: true, data: parsed })
+
+        // Add rate limit headers
+        result.headers.set('X-RateLimit-Limit', limit.toString())
+        result.headers.set('X-RateLimit-Remaining', remaining.toString())
+        result.headers.set('X-RateLimit-Reset', reset.toString())
+
+        return result
     } catch (error) {
         console.error('Scrape URL error:', error)
         return NextResponse.json(

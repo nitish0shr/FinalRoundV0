@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signup } from "@/app/auth/actions"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,33 +27,19 @@ export default function SignupPage() {
         setIsLoading(true)
 
         try {
-            // Call signup API
-            const response = await fetch("/api/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password }),
-            })
+            const formData = new FormData()
+            formData.append('email', email)
+            formData.append('password', password)
+            formData.append('name', name)
+            formData.append('role', 'candidate') // Default to candidate, will be updated in onboarding
 
-            const result = await response.json()
+            const result = await signup(formData)
 
-            if (!response.ok) {
-                throw new Error(result.error || "Failed to create account")
-            }
-
-            toast.success("Account created! Logging you in...")
-
-            // Auto-login after signup
-            const loginResult = await signIn("credentials", {
-                email,
-                password,
-                redirect: false,
-            })
-
-            if (loginResult?.error) {
-                toast.error("Account created but login failed. Please try logging in.")
-                router.push("/login")
+            if (result?.error) {
+                toast.error(result.error)
             } else {
-                router.push("/dashboard")
+                toast.success("Account created! Redirecting...")
+                // Redirect handled by server action
             }
         } catch (error: any) {
             toast.error(error.message || "Something went wrong")
@@ -62,10 +48,11 @@ export default function SignupPage() {
         }
     }
 
-    const handleLinkedInSignIn = async () => {
-        setIsLoading(true)
-        await signIn("linkedin", { callbackUrl: "/dashboard" })
-    }
+    // LinkedIn auth deferred
+    // const handleLinkedInSignIn = async () => {
+    //     setIsLoading(true)
+    //     // await signIn("linkedin", { callbackUrl: "/dashboard" })
+    // }
 
     return (
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-10">
@@ -80,7 +67,7 @@ export default function SignupPage() {
                         <CardDescription>Get started with FinalRound today</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {hasLinkedIn && (
+                        {/* {hasLinkedIn && (
                             <>
                                 <Button
                                     variant="outline"
@@ -103,7 +90,7 @@ export default function SignupPage() {
                                     </div>
                                 </div>
                             </>
-                        )}
+                        )} */}
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">

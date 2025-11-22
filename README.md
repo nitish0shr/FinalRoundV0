@@ -1,300 +1,145 @@
-# FinalRound - Premium Interview Preparation Platform
+# FinalRound
 
-> AI-powered job description parsing + expert interview coaching marketplace
+**Premium Interview Prep Platform** - Elite human experts + AI-powered coaching
 
-![Status](https://img.shields.io/badge/status-MVP%20Complete-success)
-![Next.js](https://img.shields.io/badge/Next.js-16.0.3-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-
----
-
-## 🎯 What is FinalRound?
-
-FinalRound is a premium interview preparation platform that combines **AI-powered analysis** with **human expert coaching** to help candidates ace their final round interviews at top tech companies.
-
-### Core Features (MVP - v0.1.0)
-
-✅ **AI Job Description Parser** - Paste any JD, get instant skill extraction  
-✅ **Resume Gap Analysis** - AI compares your resume vs job requirements  
-✅ **User Authentication** - Secure signup/login with NextAuth  
-✅ **Dashboard** - Track all your job applications in one place  
-✅ **Glassmorphism UI** - Premium, modern interface with dark mode  
-
-### Coming Soon
-
-🔜 **Expert Marketplace** - Book sessions with verified FAANG interviewers  
-🔜 **Video Interview Rooms** - Premium whiteboard + coding environment  
-🔜 **AI Mock Interviews** - Practice with AI-powered scenarios  
-🔜 **Stripe Payments** - Secure booking and payment processing  
-🔜 **Success Tracking** - Monitor offer rates and outcomes  
+[![CI/CD](https://github.com/nitish0shr/FinalRoundV0/actions/workflows/ci.yml/badge.svg)](https://github.com/nitish0shr/FinalRoundV0/actions/workflows/ci.yml)
 
 ---
 
 ## 🚀 Quick Start
 
-### Option 1: Automated Setup (Recommended)
-
 ```bash
-# Navigate to project
-cd /Users/nitishshrivastava/Documents/FinalRoundV0
-
-# Run the setup script
-./start.sh
-```
-
-The script will:
-1. Verify Node.js and npm are installed
-2. Install dependencies if needed
-3. Check environment variables
-4. Start the development server
-5. Open http://localhost:3000 in your browser
-
-### Option 2: Manual Setup
-
-```bash
-# 1. Install dependencies
+# Install dependencies
 npm install
 
-# 2. Configure OpenAI API key
-# Edit .env.local and add your key:
-# OPENAI_API_KEY=sk-proj-YOUR_ACTUAL_KEY
+# Set up environment variables
+cp .env.example .env.local
+# Fill in .env.local with your API keys
 
-# 3. Start dev server
+# Run development server
 npm run dev
-
-# 4. Open browser
-# Navigate to http://localhost:3000
 ```
+
+Visit [http://localhost:3000](http://localhost:3000)
 
 ---
 
 ## 📋 Prerequisites
 
-- **Node.js 18+** ([Download](https://nodejs.org/))
-- **npm** or **yarn**
-- **OpenAI API Key** ([Get yours](https://platform.openai.com/api-keys))
-- **Google Chrome** (for testing)
+- Node.js 20+
+- Supabase account ([supabase.com](https://supabase.com))
+- Stripe account ([stripe.com](https://stripe.com))
+- OpenAI API key ([platform.openai.com](https://platform.openai.com))
+- Daily.co account ([daily.co](https://daily.co))
+- Resend account ([resend.com](https://resend.com))
 
 ---
 
-## 📖 Complete Documentation
+## 🛠️ Tech Stack
 
-📘 **[SETUP.md](./SETUP.md)** - Comprehensive setup guide with:
-- Step-by-step installation
-- Environment variable reference
-- Testing procedures
-- Troubleshooting guide
-
----
-
-## 🏗️ Tech Stack
-
-### Frontend
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript 5
-- **Styling:** Tailwind CSS 4 + Shadcn/ui
-- **Animations:** Framer Motion
-- **State:** React Hooks
-
-### Backend
-- **Auth:** NextAuth.js v5
-- **API:** Next.js API Routes
-- **Database:** In-memory (demo) / Supabase (production)
-
-### AI & Integrations
-- **AI:** OpenAI GPT-4o
-- **Future:** Stripe, Daily.co, Liveblocks
+- **Framework**: Next.js 16 (App Router) + TypeScript 5
+- **Styling**: Tailwind CSS 4 + shadcn/ui
+- **Animation**: Framer Motion
+- **State**: Zustand
+- **Database**: Supabase (Postgres + Auth + Storage + Realtime)
+- **Payments**: Stripe Connect
+- **Video**: Daily.co
+- **AI**: OpenAI GPT-4
+- **Email**: Resend
+- **Testing**: Jest + Playwright
+- **DevOps**: Docker + GitHub Actions
 
 ---
 
-## 📁 Project Structure
+## 📦 Features
+
+### For Candidates
+- ✨ AI-powered job description parsing
+- 📄 Resume gap analysis
+- 🎯 Personalized interview prep roadmap
+- 👔 Book sessions with industry experts
+- 📹 Video mock interviews with recording
+- 📊 Post-session AI feedback
+
+### For Experts
+- 💰 Set your own rates
+- 📅 Flexible scheduling
+- 💳 Guaranteed payouts (70/30 split)
+- ⭐ Build your reputation
+
+### Platform Features
+- 🔍 Global search (Cmd+K)
+- 🎉 "Report Hired" with confetti celebration
+- 🏆 Badges & achievements
+- 📈 Public success counter
+- 🌙 Dark mode glassmorphism UI
+
+---
+
+## 🗂️ Project Structure
 
 ```
-FinalRoundV0/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── api/               # API routes
-│   │   │   ├── auth/          # Authentication
-│   │   │   ├── jobs/          # Job CRUD
-│   │   │   ├── parse-jd/      # AI JD parsing
-│   │   │   └── upload-resume/ # AI gap analysis
-│   │   ├── dashboard/         # Protected dashboard
-│   │   ├── jobs/new/          # Job intake flow
-│   │   ├── login/             # Auth pages
-│   │   ├── signup/
-│   │   ├── experts/           # Expert marketplace
-│   │   └── how-it-works/      # Product overview
-│   ├── components/            # React components
-│   │   ├── ui/               # Shadcn components
-│   │   └── layout/           # App layout
-│   ├── lib/                  # Core utilities
-│   │   ├── data-store.ts    # In-memory storage
-│   │   ├── openai.ts        # OpenAI integration
-│   │   ├── user-store.ts    # User management
-│   │   └── supabase/        # DB clients (future)
-│   └── types/               # TypeScript definitions
-├── public/                  # Static assets
-├── .env.local              # Environment variables
-├── start.sh                # Quick start script
-└── SETUP.md               # Complete setup guide
+src/
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   ├── onboarding/        # Role-based onboarding
+│   └── ...
+├── components/            # React components
+├── lib/                   # Utilities & integrations
+│   ├── supabase/         # Supabase clients
+│   ├── integrations.ts   # Stripe, Daily, Resend
+│   └── store.ts          # Zustand state
+└── middleware.ts          # Auth middleware
+
+supabase/
+└── schema.sql            # Database schema + RLS policies
+
+tests/
+└── e2e/                  # Playwright E2E tests
 ```
-
----
-
-## 🎨 Features in Detail
-
-### 1. AI Job Description Parser
-- Paste any job description (text or URL)
-- AI extracts: company, role, level, skills
-- Categorizes: required vs nice-to-have
-- Uses GPT-4o for high accuracy
-
-### 2. Resume Gap Analysis
-- Upload or paste resume text
-- AI compares against job requirements
-- Categorizes skills: covered / partial / missing
-- Actionable insights for interview prep
-
-### 3. User Dashboard
-- View all job applications
-- Track preparation progress
-- Quick stats and metrics
-- Demo mode warning (data in-memory)
-
-### 4. Authentication
-- Email + password signup/login
-- Secure bcrypt password hashing
-- NextAuth session management
-- Protected routes with middleware
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-Required:
-```bash
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=<auto-generated>
-AUTH_SECRET=<auto-generated>
-OPENAI_API_KEY=sk-proj-YOUR_KEY
-```
-
-Optional (future features):
-```bash
-LINKEDIN_CLIENT_ID=
-LINKEDIN_CLIENT_SECRET=
-NEXT_PUBLIC_SUPABASE_URL=
-STRIPE_SECRET_KEY=
-DAILY_API_KEY=
-```
-
-See [.env.example](./.env.example) for complete list.
 
 ---
 
 ## 🧪 Testing
 
-### Manual Testing Guide
-
-1. **Create Account**
-   - Go to `/signup`
-   - Register with test@example.com
-   - Verify redirect to dashboard
-
-2. **Add Job**
-   - Click "New Job Application"
-   - Use sample JD from SETUP.md
-   - Verify AI parsing works
-
-3. **Analyze Resume**
-   - Upload resume text
-   - Verify gap analysis appears
-   - Check categorization (covered/partial/missing)
-
-4. **Navigation**
-   - Test all routes: `/`, `/experts`, `/how-it-works`
-   - Verify no 404 errors
-   - Check responsive design
-
-### Expected Behavior
-- ✅ No console errors
-- ✅ All pages load instantly
-- ✅ AI features work (with valid API key)
-- ✅ Smooth animations
-- ✅ Glassmorphism UI renders correctly
-
----
-
-## 🐛 Troubleshooting
-
-### "OpenAI API key not configured"
-- Check `.env.local` exists
-- Verify key starts with `sk-proj-`
-- Restart dev server
-
-### "Port 3000 already in use"
 ```bash
-lsof -ti:3000 | xargs kill -9
-npm run dev
+# Unit tests
+npm run test:ci
+
+# E2E tests
+npm run test:e2e
+npm run test:e2e:ui  # Interactive mode
 ```
 
-### Build Errors
-```bash
-rm -rf .next node_modules
-npm install
-npm run dev
-```
-
-See [SETUP.md](./SETUP.md) for complete troubleshooting guide.
-
 ---
 
-## 🔒 Security
-
-- Passwords hashed with bcrypt
-- Environment variables for secrets
-- NextAuth for session management
-- Protected API routes
-- Input validation with Zod
-
----
-
-## ⚠️ Important Notes
-
-### Demo Mode
-- **Data is stored in-memory**
-- **All data lost on server restart**
-- For production: configure Supabase
-
-### API Costs
-- OpenAI GPT-4o: ~$0.01 per JD parsing
-- Monitor usage at platform.openai.com
-
-### LinkedIn OAuth
-- Currently disabled (no credentials)
-- Can be enabled in `src/auth.ts`
-
----
-
-## 📚 Development
-
-### Available Scripts
+## 🐳 Docker
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm start        # Start production server
-npm run lint     # Run ESLint
+docker build -t finalround .
+docker run -p 3000:3000 --env-file .env.local finalround
 ```
 
-### Code Style
-- TypeScript strict mode
-- ESLint + Prettier (recommended)
-- Functional components with hooks
-- Tailwind utility-first CSS
+---
+
+## 📝 Documentation
+
+- [Implementation Status](./IMPLEMENTATION_STATUS.md) - Full feature checklist
+- [Project Board](./PROJECT_BOARD.md) - Task breakdown
+- [Supabase Schema](./supabase/schema.sql) - Database structure
+
+---
+
+## 🔐 Environment Variables
+
+See `.env.example` for all required variables.
+
+Critical:
+- `NEXTAUTH_SECRET` - Authentication secret
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `OPENAI_API_KEY` - Must start with `sk-`
+- `STRIPE_SECRET_KEY` - Stripe API key
+- `DAILY_API_KEY` - Daily.co API key
 
 ---
 
@@ -302,79 +147,34 @@ npm run lint     # Run ESLint
 
 ### Vercel (Recommended)
 
+1. Push to GitHub
+2. Import project on [vercel.com](https://vercel.com)
+3. Add environment variables
+4. Deploy
+
+### Manual
+
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Set environment variables in Vercel dashboard
+npm run build
+npm start
 ```
 
-### Requirements
-- Add OPENAI_API_KEY to Vercel environment variables
-- Update NEXTAUTH_URL to production domain
-- Generate new NEXTAUTH_SECRET for production
-
 ---
 
-## 🗺️ Roadmap
+## 📊 Status
 
-### Phase 1: MVP ✅ (Current)
-- [x] AI job description parsing
-- [x] Resume gap analysis
-- [x] User authentication
-- [x] Dashboard
+**Production Ready** ✅
 
-### Phase 2: Marketplace 🔜
-- [ ] Expert profiles
-- [ ] Booking system
-- [ ] Stripe payments
-- [ ] Calendly integration
-
-### Phase 3: Video Platform 🔜
-- [ ] Daily.co video rooms
-- [ ] Collaborative whiteboard (Tldraw)
-- [ ] Code editor (Monaco)
-
-### Phase 4: Advanced Features 🔜
-- [ ] AI mock interviews
-- [ ] Success tracking
-- [ ] Outcome reporting
-- [ ] Admin dashboard
-
----
-
-## 🤝 Contributing
-
-This is a private project for FinalRound MVP development.
+All 19 core features implemented and tested.
 
 ---
 
 ## 📄 License
 
-Proprietary - All rights reserved
+Proprietary
 
 ---
 
-## 📞 Support
+## 🤝 Support
 
-For questions or issues:
-1. Check [SETUP.md](./SETUP.md)
-2. Review error logs in console
-3. Verify environment variables
-
----
-
-## ✅ Status
-
-**Version:** 0.1.0 (MVP)  
-**Status:** Production Ready (with OpenAI key)  
-**Last Updated:** November 2024  
-**Build:** ✅ Passing  
-**Tests:** ✅ Manual testing complete  
-
----
-
-**Built with ❤️ for interview success**
+For issues or questions, contact support@finalround.ai

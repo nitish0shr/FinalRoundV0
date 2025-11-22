@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { ParsedJD, GapAnalysis } from '@/types/job';
+import { saveStores, loadStores, scheduleSave } from './persistence';
 
 // =============================================
 // JOB STORE
 // =============================================
 
-// Using Job type from @/types/job to avoid duplication
 export interface Job {
     id: string;
     userId: string;
@@ -46,6 +46,7 @@ class JobStoreClass {
             updatedAt: new Date(),
         };
         this.jobs.set(job.id, job);
+        this.triggerSave();
         return job;
     }
 
@@ -74,11 +75,18 @@ class JobStoreClass {
             updatedAt: new Date(),
         };
         this.jobs.set(id, updatedJob);
+        this.triggerSave();
         return updatedJob;
     }
 
     deleteJob(id: string): boolean {
-        return this.jobs.delete(id);
+        const result = this.jobs.delete(id);
+        if (result) this.triggerSave();
+        return result;
+    }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
     }
 }
 
@@ -116,6 +124,7 @@ class ResumeStoreClass {
             updatedAt: new Date(),
         };
         this.resumes.set(resume.id, resume);
+        this.triggerSave();
         return resume;
     }
 
@@ -145,11 +154,18 @@ class ResumeStoreClass {
             updatedAt: new Date(),
         };
         this.resumes.set(id, updatedResume);
+        this.triggerSave();
         return updatedResume;
     }
 
     deleteResume(id: string): boolean {
-        return this.resumes.delete(id);
+        const result = this.resumes.delete(id);
+        if (result) this.triggerSave();
+        return result;
+    }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
     }
 }
 
@@ -205,6 +221,7 @@ class ExpertProfileStoreClass {
             updatedAt: new Date(),
         };
         this.experts.set(expert.id, expert);
+        this.triggerSave();
         return expert;
     }
 
@@ -238,11 +255,16 @@ class ExpertProfileStoreClass {
             updatedAt: new Date(),
         };
         this.experts.set(id, updatedExpert);
+        this.triggerSave();
         return updatedExpert;
     }
 
     approveExpert(id: string): ExpertProfile | undefined {
         return this.updateExpert(id, { isApproved: true });
+    }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
     }
 }
 
@@ -289,6 +311,7 @@ class BookingStoreClass {
             updatedAt: new Date(),
         };
         this.bookings.set(booking.id, booking);
+        this.triggerSave();
         return booking;
     }
 
@@ -318,6 +341,7 @@ class BookingStoreClass {
             updatedAt: new Date(),
         };
         this.bookings.set(id, updatedBooking);
+        this.triggerSave();
         return updatedBooking;
     }
 
@@ -331,6 +355,10 @@ class BookingStoreClass {
 
     cancelBooking(id: string): Booking | undefined {
         return this.updateBooking(id, { status: 'cancelled' });
+    }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
     }
 }
 
@@ -366,6 +394,7 @@ class ReviewStoreClass {
             createdAt: new Date(),
         };
         this.reviews.set(review.id, review);
+        this.triggerSave();
         return review;
     }
 
@@ -389,6 +418,10 @@ class ReviewStoreClass {
 
         const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
         return sum / reviews.length;
+    }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
     }
 }
 
@@ -426,6 +459,7 @@ class OutcomeStoreClass {
             createdAt: new Date(),
         };
         this.outcomes.set(outcome.id, outcome);
+        this.triggerSave();
         return outcome;
     }
 
@@ -450,6 +484,127 @@ class OutcomeStoreClass {
         const offers = outcomes.filter(outcome => outcome.gotOffer).length;
         return (offers / outcomes.length) * 100;
     }
+
+    private triggerSave() {
+        scheduleSave(() => saveAllStores());
+    }
 }
 
 export const OutcomeStore = new OutcomeStoreClass();
+
+// =============================================
+// PERSISTENCE LAYER
+// =============================================
+
+// Helper to convert Date strings back to Date objects
+function reviveDate(key: string, value: any) {
+    const dateFields = ['createdAt', 'updatedAt', 'scheduledAt'];
+    if (dateFields.includes(key) && typeof value === 'string') {
+        return new Date(value);
+    }
+    return value;
+}
+
+// Save all stores to disk
+async function saveAllStores() {
+    const data = {
+        users: ((userStore as any).users || []).map((u: any) => [u.id, u] as [string, any]),
+        jobs: Array.from(JobStore['jobs'].entries()),
+        resumes: Array.from(ResumeStore['resumes'].entries()),
+        experts: Array.from(ExpertProfileStore['experts'].entries()),
+        bookings: Array.from(BookingStore['bookings'].entries()),
+        reviews: Array.from(ReviewStore['reviews'].entries()),
+        outcomes: Array.from(OutcomeStore['outcomes'].entries()),
+    };
+
+    await saveStores(data);
+}
+
+// Load all stores from disk on startup
+async function loadAllStores() {
+    const data = await loadStores();
+    if (!data) return;
+
+    // Restore jobs
+    if (data.jobs) {
+        for (const [id, job] of data.jobs) {
+            const jobWithDates = {
+                ...job,
+                createdAt: new Date(job.createdAt),
+                updatedAt: new Date(job.updatedAt),
+            };
+            JobStore['jobs'].set(id, jobWithDates);
+        }
+    }
+
+    // Restore resumes
+    if (data.resumes) {
+        for (const [id, resume] of data.resumes) {
+            const resumeWithDates = {
+                ...resume,
+                createdAt: new Date(resume.createdAt),
+                updatedAt: new Date(resume.updatedAt),
+            };
+            ResumeStore['resumes'].set(id, resumeWithDates);
+        }
+    }
+
+    // Restore experts
+    if (data.experts) {
+        for (const [id, expert] of data.experts) {
+            const expertWithDates = {
+                ...expert,
+                createdAt: new Date(expert.createdAt),
+                updatedAt: new Date(expert.updatedAt),
+            };
+            ExpertProfileStore['experts'].set(id, expertWithDates);
+        }
+    }
+
+    // Restore bookings
+    if (data.bookings) {
+        for (const [id, booking] of data.bookings) {
+            const bookingWithDates = {
+                ...booking,
+                scheduledAt: new Date(booking.scheduledAt),
+                createdAt: new Date(booking.createdAt),
+                updatedAt: new Date(booking.updatedAt),
+            };
+            BookingStore['bookings'].set(id, bookingWithDates);
+        }
+    }
+
+    // Restore reviews
+    if (data.reviews) {
+        for (const [id, review] of data.reviews) {
+            const reviewWithDates = {
+                ...review,
+                createdAt: new Date(review.createdAt),
+            };
+            ReviewStore['reviews'].set(id, reviewWithDates);
+        }
+    }
+
+    // Restore outcomes
+    if (data.outcomes) {
+        for (const [id, outcome] of data.outcomes) {
+            const outcomeWithDates = {
+                ...outcome,
+                createdAt: new Date(outcome.createdAt),
+            };
+            OutcomeStore['outcomes'].set(id, outcomeWithDates);
+        }
+    }
+}
+
+// Import userStore at runtime to avoid circular dependency
+import { userStore } from './user-store';
+
+// Load data on module initialization
+if (typeof window === 'undefined') {
+    // Only run on server
+    loadAllStores().catch(console.error);
+}
+
+// Export save function for manual triggering if needed
+export { saveAllStores, loadAllStores };
