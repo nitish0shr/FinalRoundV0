@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Star, Briefcase, Award } from "lucide-react"
+import { Star, Briefcase, CheckCircle, Users } from "lucide-react"
 import Link from "next/link"
 
 export default function ExpertsPage() {
@@ -14,76 +14,73 @@ export default function ExpertsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-8"
             >
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-bold">
-                        Browse <span className="text-violet-400">Elite Experts</span>
+                <div className="text-center max-w-3xl mx-auto">
+                    <h1 className="text-5xl font-bold mb-4">
+                        Meet Our <span className="text-violet-400">Elite Experts</span>
                     </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Connect with verified interviewers from FAANG and top tech companies
+                    <p className="text-xl text-muted-foreground">
+                        Verified interviewers from FAANG and top tech companies, ready to help you ace your final round.
                     </p>
                 </div>
 
-                <Card className="border-white/10 bg-white/5 backdrop-blur-xl text-center py-12">
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-center mb-4">
-                            <div className="h-20 w-20 rounded-full bg-violet-500/20 flex items-center justify-center">
-                                <Star className="h-10 w-10 text-violet-400" />
+                {/* Coming Soon Banner */}
+                <Card className="border-violet-500/30 bg-violet-500/5 backdrop-blur-xl max-w-2xl mx-auto">
+                    <CardContent className="pt-6">
+                        <div className="text-center space-y-4">
+                            <Users className="h-16 w-16 text-violet-400 mx-auto" />
+                            <h2 className="text-2xl font-bold">Expert Marketplace Coming Soon</h2>
+                            <p className="text-muted-foreground">
+                                We're currently onboarding elite interview experts from:
+                            </p>
+                            <div className="flex flex-wrap justify-center gap-3 pt-2">
+                                {['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft', 'Netflix'].map((company) => (
+                                    <span
+                                        key={company}
+                                        className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium"
+                                    >
+                                        {company}
+                                    </span>
+                                ))}
                             </div>
-                        </div>
-                        <h2 className="text-2xl font-semibold">Expert Directory Coming Soon</h2>
-                        <p className="text-muted-foreground max-w-md mx-auto">
-                            We're currently onboarding and verifying elite interview experts from top tech companies.
-                            Check back soon!
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                            <Link href="/signup">
-                                <Button className="bg-violet-600 hover:bg-violet-700">
-                                    Get Notified When Available
-                                </Button>
-                            </Link>
-                            <Link href="/dashboard">
-                                <Button variant="outline" className="border-white/10">
-                                    Go to Dashboard
-                                </Button>
-                            </Link>
+                            <div className="pt-4">
+                                <Link href="/signup">
+                                    <Button className="bg-violet-600 hover:bg-violet-700">
+                                        Join Waitlist
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Preview Features */}
-                <div className="grid gap-6 md:grid-cols-3 pt-8">
+                {/* Features Grid */}
+                <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto pt-8">
                     <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
                         <CardHeader>
-                            <div className="h-12 w-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4">
-                                <Briefcase className="h-6 w-6 text-violet-400" />
-                            </div>
-                            <CardTitle>Verified Backgrounds</CardTitle>
+                            <Star className="h-8 w-8 text-yellow-400 mb-2" />
+                            <CardTitle>Verified Expertise</CardTitle>
                             <CardDescription>
-                                All experts verified through LinkedIn and company email verification
+                                All experts verified with employment history at top tech companies
                             </CardDescription>
                         </CardHeader>
                     </Card>
 
                     <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
                         <CardHeader>
-                            <div className="h-12 w-12 rounded-lg bg-fuchsia-500/20 flex items-center justify-center mb-4">
-                                <Star className="h-6 w-6 text-fuchsia-400" />
-                            </div>
-                            <CardTitle>Success Tracking</CardTitle>
+                            <CheckCircle className="h-8 w-8 text-green-400 mb-2" />
+                            <CardTitle>Proven Results</CardTitle>
                             <CardDescription>
-                                Real offer data and success rates tracked for every expert
+                                Track record of helping candidates land offers at competitive companies
                             </CardDescription>
                         </CardHeader>
                     </Card>
 
                     <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
                         <CardHeader>
-                            <div className="h-12 w-12 rounded-lg bg-blue-500/20 flex items-center justify-center mb-4">
-                                <Award className="h-6 w-6 text-blue-400" />
-                            </div>
-                            <CardTitle>Premium Experience</CardTitle>
+                            <Briefcase className="h-8 w-8 text-blue-400 mb-2" />
+                            <CardTitle>Real Experience</CardTitle>
                             <CardDescription>
-                                High-fidelity video rooms with collaborative coding and whiteboard tools
+                                Active or former hiring managers and senior engineers from FAANG
                             </CardDescription>
                         </CardHeader>
                     </Card>

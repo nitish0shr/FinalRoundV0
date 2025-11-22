@@ -1,31 +1,19 @@
 import OpenAI from 'openai'
 import { ParsedJD, GapAnalysis } from '@/types/job'
 
-// Initialize OpenAI client with error handling
-function createOpenAIClient() {
-    const apiKey = process.env.OPENAI_API_KEY
-
-    if (!apiKey || apiKey === 'sk-proj-placeholder-replace-with-your-actual-key') {
-        throw new Error(
-            'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env.local file. ' +
-            'Get your key at: https://platform.openai.com/api-keys'
-        )
-    }
-
-    return new OpenAI({ apiKey })
+// Validate API key at module load
+if (!process.env.OPENAI_API_KEY) {
+    console.error('CRITICAL: OPENAI_API_KEY environment variable is not set')
 }
 
-let openaiClient: OpenAI | null = null
-
-function getOpenAIClient(): OpenAI {
-    if (!openaiClient) {
-        openaiClient = createOpenAIClient()
-    }
-    return openaiClient
-}
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || 'dummy-key-for-build',
+})
 
 export async function parseJobDescription(jdText: string): Promise<ParsedJD> {
-    const openai = getOpenAIClient()
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.')
+    }
 
     const prompt = `You are an expert job description parser. Parse the following job description and extract key information in JSON format.
 
@@ -79,7 +67,9 @@ export async function analyzeGap(
     resumeText: string,
     requiredSkills: string[]
 ): Promise<GapAnalysis> {
-    const openai = getOpenAIClient()
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.')
+    }
 
     const prompt = `You are an expert resume analyzer. Compare the candidate's resume against required job skills and categorize each skill.
 

@@ -10,12 +10,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import { motion } from "framer-motion"
 import toast from "react-hot-toast"
+import { Linkedin } from "lucide-react"
 
 export default function LoginPage() {
     const router = useRouter()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+
+    // Check if LinkedIn OAuth is available (we assume it's not for now)
+    const hasLinkedIn = false // Set to true if LinkedIn credentials are configured
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -41,6 +45,11 @@ export default function LoginPage() {
         }
     }
 
+    const handleLinkedInSignIn = async () => {
+        setIsLoading(true)
+        await signIn("linkedin", { callbackUrl: "/dashboard" })
+    }
+
     return (
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-10">
             <motion.div
@@ -54,6 +63,31 @@ export default function LoginPage() {
                         <CardDescription>Sign in to your FinalRound account</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {hasLinkedIn && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-white/10 hover:bg-white/10"
+                                    onClick={handleLinkedInSignIn}
+                                    disabled={isLoading}
+                                >
+                                    <Linkedin className="mr-2 h-5 w-5" />
+                                    Continue with LinkedIn
+                                </Button>
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t border-white/10" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                            Or continue with email
+                                        </span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>

@@ -1,22 +1,27 @@
-import type { 
-    ParsedJD, 
-    GapAnalysis, 
-    Job, 
-    Resume, 
-    ExpertProfile, 
-    Booking, 
-    Review, 
-    Outcome 
-} from '@/types/job';
-
-// Generate simple UUID alternative (no external dependency needed)
-function generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
+import { v4 as uuidv4 } from 'uuid';
+import type { ParsedJD, GapAnalysis } from '@/types/job';
 
 // =============================================
 // JOB STORE
 // =============================================
+
+// Using Job type from @/types/job to avoid duplication
+export interface Job {
+    id: string;
+    userId: string;
+    company: string;
+    role: string;
+    level: string;
+    requiredSkills: string[];
+    niceToHaveSkills: string[];
+    jdRaw: string;
+    jdParsed: ParsedJD;
+    resumeUrl: string | null;
+    resumeText: string | null;
+    resumeAnalysis: GapAnalysis | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
 class JobStoreClass {
     private jobs: Map<string, Job> = new Map();
@@ -32,8 +37,11 @@ class JobStoreClass {
         jdParsed: ParsedJD;
     }): Job {
         const job: Job = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
+            resumeUrl: null,
+            resumeText: null,
+            resumeAnalysis: null,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -80,6 +88,17 @@ export const JobStore = new JobStoreClass();
 // RESUME STORE
 // =============================================
 
+export interface Resume {
+    id: string;
+    userId: string;
+    jobId?: string;
+    resumeText: string;
+    resumeUrl?: string;
+    gapAnalysis?: GapAnalysis;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 class ResumeStoreClass {
     private resumes: Map<string, Resume> = new Map();
 
@@ -91,7 +110,7 @@ class ResumeStoreClass {
         gapAnalysis?: GapAnalysis;
     }): Resume {
         const resume: Resume = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -140,6 +159,26 @@ export const ResumeStore = new ResumeStoreClass();
 // EXPERT PROFILE STORE
 // =============================================
 
+export interface ExpertProfile {
+    id: string;
+    userId: string;
+    bio?: string;
+    company?: string;
+    role?: string;
+    yearsExperience?: number;
+    hourlyRate: number;
+    introVideoUrl?: string;
+    calendlyLink?: string;
+    isApproved: boolean;
+    successRate: number;
+    totalSessions: number;
+    totalEarnings: number;
+    offerGuaranteed: boolean;
+    blindBookingEnabled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 class ExpertProfileStoreClass {
     private experts: Map<string, ExpertProfile> = new Map();
 
@@ -154,7 +193,7 @@ class ExpertProfileStoreClass {
         calendlyLink?: string;
     }): ExpertProfile {
         const expert: ExpertProfile = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
             isApproved: false,
             successRate: 0,
@@ -213,6 +252,22 @@ export const ExpertProfileStore = new ExpertProfileStoreClass();
 // BOOKING STORE
 // =============================================
 
+export interface Booking {
+    id: string;
+    candidateId: string;
+    expertId: string;
+    jobId?: string;
+    scheduledAt: Date;
+    durationHours: number;
+    price: number;
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'refunded';
+    stripePaymentIntentId?: string;
+    videoRoomUrl?: string;
+    isBlind: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 class BookingStoreClass {
     private bookings: Map<string, Booking> = new Map();
 
@@ -226,7 +281,7 @@ class BookingStoreClass {
         isBlind?: boolean;
     }): Booking {
         const booking: Booking = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
             status: 'pending',
             isBlind: data.isBlind || false,
@@ -285,6 +340,16 @@ export const BookingStore = new BookingStoreClass();
 // REVIEW STORE
 // =============================================
 
+export interface Review {
+    id: string;
+    bookingId: string;
+    reviewerId: string;
+    expertId: string;
+    rating: number; // 1-5
+    reviewText?: string;
+    createdAt: Date;
+}
+
 class ReviewStoreClass {
     private reviews: Map<string, Review> = new Map();
 
@@ -296,7 +361,7 @@ class ReviewStoreClass {
         reviewText?: string;
     }): Review {
         const review: Review = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
             createdAt: new Date(),
         };
@@ -333,6 +398,17 @@ export const ReviewStore = new ReviewStoreClass();
 // OUTCOME STORE
 // =============================================
 
+export interface Outcome {
+    id: string;
+    bookingId: string;
+    candidateId: string;
+    expertId: string;
+    jobId?: string;
+    gotOffer: boolean;
+    offerDetails?: string;
+    createdAt: Date;
+}
+
 class OutcomeStoreClass {
     private outcomes: Map<string, Outcome> = new Map();
 
@@ -345,7 +421,7 @@ class OutcomeStoreClass {
         offerDetails?: string;
     }): Outcome {
         const outcome: Outcome = {
-            id: generateId(),
+            id: uuidv4(),
             ...data,
             createdAt: new Date(),
         };

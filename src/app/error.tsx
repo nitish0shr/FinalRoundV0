@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle } from 'lucide-react'
 
 export default function Error({
     error,
@@ -18,23 +17,20 @@ export default function Error({
 
     return (
         <div className="container flex min-h-screen flex-col items-center justify-center py-10">
-            <Card className="max-w-md border-red-500/20 bg-red-500/5 backdrop-blur-xl">
+            <Card className="max-w-md border-red-500/30 bg-red-500/5 backdrop-blur-xl">
                 <CardHeader>
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-500/20 rounded-lg">
-                            <AlertCircle className="h-6 w-6 text-red-400" />
-                        </div>
-                        <div>
-                            <CardTitle>Something went wrong!</CardTitle>
-                            <CardDescription>An error occurred while loading this page</CardDescription>
-                        </div>
-                    </div>
+                    <CardTitle className="text-red-400">Something went wrong!</CardTitle>
+                    <CardDescription>
+                        An unexpected error occurred. This has been logged and we'll look into it.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground bg-white/5 p-3 rounded-lg font-mono">
-                        {error.message || 'Unknown error'}
-                    </p>
-                    <div className="flex gap-3">
+                    <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                        <p className="text-sm font-mono text-muted-foreground break-all">
+                            {error.message || 'Unknown error'}
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
                         <Button 
                             onClick={reset} 
                             className="flex-1 bg-violet-600 hover:bg-violet-700"
@@ -42,9 +38,9 @@ export default function Error({
                             Try again
                         </Button>
                         <Button 
-                            variant="outline" 
-                            className="border-white/10"
+                            variant="outline"
                             onClick={() => window.location.href = '/'}
+                            className="flex-1 border-white/10"
                         >
                             Go Home
                         </Button>

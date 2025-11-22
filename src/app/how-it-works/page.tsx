@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { FileText, Search, Calendar, Video, TrendingUp } from "lucide-react"
+import { FileText, Sparkles, Users, Video, TrendingUp, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
 export default function HowItWorksPage() {
@@ -14,76 +14,101 @@ export default function HowItWorksPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-12"
             >
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-bold">
+                <div className="text-center max-w-3xl mx-auto">
+                    <h1 className="text-5xl font-bold mb-4">
                         How <span className="text-violet-400">FinalRound</span> Works
                     </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Your journey from job application to offer, powered by AI and expert guidance
+                    <p className="text-xl text-muted-foreground">
+                        From job description to offer letter—here's how we help you ace your interviews
                     </p>
                 </div>
 
-                {/* Process Steps */}
-                <div className="space-y-8">
-                    <ProcessStep
+                {/* Step-by-Step Process */}
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <StepCard
                         number={1}
-                        icon={<FileText className="h-8 w-8 text-violet-400" />}
-                        title="Add Your Job Description"
-                        description="Paste the JD, upload a PDF, or provide a URL. Our AI instantly extracts required skills, experience level, and key requirements."
-                        status="Available Now"
+                        icon={<FileText className="h-10 w-10 text-violet-400" />}
+                        title="Add Your Target Job"
+                        description="Paste the job description or LinkedIn URL. Our AI instantly parses requirements, skills, and company details."
+                        features={[
+                            "Automatic skill extraction",
+                            "Company research",
+                            "Level detection (Junior/Senior/Staff)"
+                        ]}
                     />
 
-                    <ProcessStep
+                    <StepCard
                         number={2}
-                        icon={<Search className="h-8 w-8 text-fuchsia-400" />}
-                        title="AI Gap Analysis"
-                        description="Upload your resume and get instant AI-powered analysis showing which skills you have, which need work, and where you stand vs. requirements."
-                        status="Available Now"
+                        icon={<Sparkles className="h-10 w-10 text-fuchsia-400" />}
+                        title="Upload Your Resume"
+                        description="Get instant AI-powered gap analysis. See exactly which skills you have, which need work, and what's missing."
+                        features={[
+                            "Skills coverage analysis",
+                            "Gap identification",
+                            "Personalized recommendations"
+                        ]}
                     />
 
-                    <ProcessStep
+                    <StepCard
                         number={3}
-                        icon={<Calendar className="h-8 w-8 text-blue-400" />}
-                        title="Book Expert Sessions"
-                        description="Browse verified experts from your target company or similar roles. See their success rates, reviews, and availability."
-                        status="Coming Soon"
+                        icon={<Users className="h-10 w-10 text-blue-400" />}
+                        title="Book an Expert"
+                        description="Choose from verified interviewers who've worked at your target company. Schedule a mock interview tailored to your role."
+                        features={[
+                            "Company-specific experts",
+                            "Flexible scheduling",
+                            "1-on-1 or blind interviews"
+                        ]}
+                        comingSoon
                     />
 
-                    <ProcessStep
+                    <StepCard
                         number={4}
-                        icon={<Video className="h-8 w-8 text-green-400" />}
-                        title="Practice & Prepare"
-                        description="Join high-quality video sessions with real-time coding, whiteboard collaboration, and expert feedback tailored to your gaps."
-                        status="Coming Soon"
+                        icon={<Video className="h-10 w-10 text-green-400" />}
+                        title="Practice in Real-Time"
+                        description="Join a premium video room with whiteboard, code editor, and screen sharing. Get immediate feedback and coaching."
+                        features={[
+                            "HD video & audio",
+                            "Collaborative whiteboard",
+                            "Code execution environment"
+                        ]}
+                        comingSoon
                     />
 
-                    <ProcessStep
+                    <StepCard
                         number={5}
-                        icon={<TrendingUp className="h-8 w-8 text-yellow-400" />}
+                        icon={<TrendingUp className="h-10 w-10 text-orange-400" />}
                         title="Track Your Progress"
-                        description="Monitor your improvement, get offer outcome tracking, and see how you compare to successful candidates."
-                        status="Coming Soon"
+                        description="Monitor your improvement across sessions. See your success rate, skills development, and expert recommendations."
+                        features={[
+                            "Performance analytics",
+                            "Skill progression tracking",
+                            "Outcome tracking (offers received)"
+                        ]}
+                        comingSoon
                     />
                 </div>
 
                 {/* CTA Section */}
-                <Card className="border-white/10 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 backdrop-blur-xl text-center">
-                    <CardContent className="py-12 space-y-6">
-                        <h2 className="text-3xl font-bold">Ready to Ace Your Interview?</h2>
-                        <p className="text-muted-foreground max-w-md mx-auto">
-                            Start with AI-powered gap analysis and track your preparation journey
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link href="/signup">
-                                <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
-                                    Get Started Free
-                                </Button>
-                            </Link>
-                            <Link href="/dashboard">
-                                <Button size="lg" variant="outline" className="border-white/10">
-                                    Go to Dashboard
-                                </Button>
-                            </Link>
+                <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 backdrop-blur-xl max-w-3xl mx-auto">
+                    <CardContent className="pt-6">
+                        <div className="text-center space-y-4">
+                            <h2 className="text-3xl font-bold">Ready to Master Your Final Round?</h2>
+                            <p className="text-muted-foreground max-w-xl mx-auto">
+                                Join candidates who've landed offers at top tech companies with FinalRound's AI-powered prep and expert coaching.
+                            </p>
+                            <div className="flex gap-4 justify-center pt-4">
+                                <Link href="/signup">
+                                    <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
+                                        Get Started Free
+                                    </Button>
+                                </Link>
+                                <Link href="/dashboard">
+                                    <Button size="lg" variant="outline" className="border-white/10">
+                                        View Dashboard
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -92,55 +117,60 @@ export default function HowItWorksPage() {
     )
 }
 
-function ProcessStep({
+function StepCard({
     number,
     icon,
     title,
     description,
-    status,
+    features,
+    comingSoon
 }: {
     number: number
     icon: React.ReactNode
     title: string
     description: string
-    status: string
+    features: string[]
+    comingSoon?: boolean
 }) {
     return (
         <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
             transition={{ delay: number * 0.1 }}
-            className="relative"
+            viewport={{ once: true }}
         >
-            <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
+            <Card className="border-white/10 bg-white/5 backdrop-blur-xl relative">
+                {comingSoon && (
+                    <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-xs font-medium text-violet-300">
+                            Coming Soon
+                        </span>
+                    </div>
+                )}
                 <CardHeader>
-                    <div className="flex items-start gap-6">
+                    <div className="flex items-start gap-4">
                         <div className="flex-shrink-0">
-                            <div className="h-16 w-16 rounded-full bg-white/5 border-2 border-violet-500/30 flex items-center justify-center text-2xl font-bold text-violet-400">
+                            <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xl">
                                 {number}
                             </div>
                         </div>
                         <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="p-2 bg-white/5 rounded-lg">
-                                    {icon}
-                                </div>
-                                <div className="flex-1">
-                                    <CardTitle className="text-xl">{title}</CardTitle>
-                                    <span className={`text-xs px-2 py-1 rounded-full ${
-                                        status === "Available Now" 
-                                            ? "bg-green-500/20 text-green-400 border border-green-500/30" 
-                                            : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                                    }`}>
-                                        {status}
-                                    </span>
-                                </div>
-                            </div>
+                            <div className="mb-3">{icon}</div>
+                            <CardTitle className="text-2xl mb-2">{title}</CardTitle>
                             <CardDescription className="text-base">{description}</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2 ml-16">
+                        {features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                                {feature}
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
             </Card>
         </motion.div>
     )

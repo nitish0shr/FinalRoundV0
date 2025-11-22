@@ -9,66 +9,46 @@ export default function GlobalError({
 }) {
     return (
         <html>
-            <body>
-                <div style={{ 
-                    padding: '3rem', 
+            <body style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                backgroundColor: '#0a0a0a',
+                color: '#ffffff',
+                fontFamily: 'system-ui, sans-serif',
+                padding: '2rem'
+            }}>
+                <div style={{
+                    maxWidth: '500px',
+                    width: '100%',
                     textAlign: 'center',
-                    minHeight: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#0a0a0a',
-                    color: '#ffffff'
+                    padding: '2rem',
+                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '12px'
                 }}>
-                    <div style={{
-                        maxWidth: '500px',
-                        padding: '2rem',
-                        border: '1px solid rgba(139, 92, 246, 0.3)',
-                        borderRadius: '12px',
-                        backgroundColor: 'rgba(139, 92, 246, 0.05)'
-                    }}>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Critical Application Error</h2>
-                        <p style={{ 
-                            marginBottom: '1.5rem', 
-                            color: '#999',
-                            fontFamily: 'monospace',
-                            padding: '1rem',
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            borderRadius: '6px'
-                        }}>
-                            {error.message || 'An unexpected error occurred'}
-                        </p>
-                        <button 
-                            onClick={reset}
-                            style={{
-                                padding: '0.75rem 2rem',
-                                backgroundColor: '#8b5cf6',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '1rem',
-                                marginRight: '1rem'
-                            }}
-                        >
-                            Try again
-                        </button>
-                        <button 
-                            onClick={() => window.location.href = '/'}
-                            style={{
-                                padding: '0.75rem 2rem',
-                                backgroundColor: 'transparent',
-                                color: 'white',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '1rem'
-                            }}
-                        >
-                            Go Home
-                        </button>
-                    </div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                        Critical Error
+                    </h2>
+                    <p style={{ color: '#a1a1aa', marginBottom: '1.5rem' }}>
+                        {error.message || 'An unexpected error occurred'}
+                    </p>
+                    <button
+                        onClick={reset}
+                        style={{
+                            backgroundColor: '#8b5cf6',
+                            color: 'white',
+                            padding: '0.75rem 1.5rem',
+                            borderRadius: '8px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '1rem',
+                            fontWeight: '500'
+                        }}
+                    >
+                        Try again
+                    </button>
                 </div>
             </body>
         </html>
