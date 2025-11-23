@@ -1,0 +1,330 @@
+/* ============================================
+   FINALROUND ANIMATION SYSTEM
+   Premium 3D effects, liquid animations, and micro-interactions
+   ============================================ */
+
+/* Liquid Blob Background Animation */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(20px, 20px) scale(1.05);
+  }
+}
+
+@keyframes blob-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(-20px, 50px) scale(1.1);
+  }
+  50% {
+    transform: translate(20px, -20px) scale(0.9);
+  }
+  75% {
+    transform: translate(-20px, -20px) scale(1.05);
+  }
+}
+
+/* Liquid Fill Animation (for success rings) */
+@keyframes liquid-fill {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes liquid-wave {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Glow Pulse */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.5),
+                0 0 40px rgba(167, 139, 250, 0.3),
+                0 0 60px rgba(167, 139, 250, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.7),
+                0 0 60px rgba(167, 139, 250, 0.5),
+                0 0 90px rgba(167, 139, 250, 0.3);
+  }
+}
+
+/* Card Hover Lift */
+@keyframes lift {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+/* Money Counter Spin */
+@keyframes money-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+/* Success Celebration */
+@keyframes celebrate-bounce {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(-3deg);
+  }
+}
+
+/* Particle Float */
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) translateX(0) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(var(--tx, 0)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Holographic Foil Effect */
+@keyframes holographic {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Gradient Shift */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Ripple Effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Slide Up with Fade */
+@keyframes slide-up-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Skeleton Loading */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Tick Success */
+@keyframes tick-draw {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Rotate In */
+@keyframes rotate-in {
+  0% {
+    transform: rotate(-180deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utility Classes */
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-blob-reverse {
+  animation: blob-reverse 9s infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-liquid-fill {
+  animation: liquid-fill 2s ease-out forwards;
+}
+
+.animate-money-spin {
+  animation: money-spin 1s ease-in-out;
+}
+
+.animate-celebrate {
+  animation: celebrate-bounce 0.6s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slide-up-fade 0.5s ease-out;
+}
+
+/* 3D Card Transform Presets */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(20px);
+}
+
+/* Glassmorphism Enhanced */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(167, 139, 250, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(167, 139, 250, 0.2);
+  transform: translateY(-5px);
+}
+
+/* Liquid Success Ring */
+.liquid-ring {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    #10b981,
+    #34d399,
+    transparent
+  );
+  animation: liquid-fill 2s ease-out forwards;
+}
+
+/* Success Indicator Colors */
+.success-low {
+  --ring-color: #ef4444; /* Red */
+}
+
+.success-medium {
+  --ring-color: #f59e0b; /* Orange */
+}
+
+.success-high {
+  --ring-color: #10b981; /* Green */
+}
+
+.success-elite {
+  --ring-color: #10b981;
+  animation: glow-pulse 2s infinite;
+}
+
+/* Particle System */
+.particles {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: particle-float 3s ease-out forwards;
+}
