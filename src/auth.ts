@@ -14,7 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: SupabaseAdapter({
     url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
+  }) as any,
   
   providers: [
     // LinkedIn OAuth (mandatory for candidates, optional for experts)
