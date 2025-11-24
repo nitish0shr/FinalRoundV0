@@ -105,7 +105,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .insert({
               email: profile.email,
               name: profile.name,
-              avatar_url: profile.picture,
+              avatar_url: (profile as any).picture,
               role: "candidate", // Default role for LinkedIn signup
               linkedin_id: profile.sub,
             })
