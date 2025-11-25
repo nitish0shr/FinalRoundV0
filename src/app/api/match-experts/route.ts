@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { getRecommendedExperts } from '@/lib/ai/expert-matcher'
 import { ParsedJobDescription, GapAnalysis } from '@/types'
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { jobDescription, gapAnalysis, limit } = body as {
       jobDescription: ParsedJobDescription

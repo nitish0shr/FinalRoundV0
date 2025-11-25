@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import OpenAI from 'openai'
 
 // Lazy initialization to avoid errors during build
@@ -18,6 +19,12 @@ function getOpenAIClient(): OpenAI {
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { conversation, jobRole, difficulty } = await request.json()
 
     const systemPrompt = `You are an expert ${jobRole} interviewer conducting a ${difficulty} difficulty interview.

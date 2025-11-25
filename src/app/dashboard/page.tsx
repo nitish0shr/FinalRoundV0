@@ -22,18 +22,31 @@ export default function DashboardPage() {
   const { data: session } = useSession()
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
-
-  // Mock stats - replace with real data
-  const stats = {
-    totalJobs: 3,
-    upcomingSessions: 2,
-    skillGapsIdentified: 5,
-    successRate: 0 // Will update after first offer
-  }
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    upcomingSessions: 0,
+    skillGapsIdentified: 0,
+    successRate: 0
+  })
 
   useEffect(() => {
     fetchJobs()
+    fetchStats()
   }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/user/stats')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.stats) {
+          setStats(data.stats)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch stats:', error)
+    }
+  }
 
   const fetchJobs = async () => {
     try {

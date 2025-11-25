@@ -29,7 +29,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 backdrop-blur-xl"
             >
               <TrendingUp className="h-4 w-4 text-green-400" />
-              <span className="text-sm font-medium">94% Success Rate • 10,000+ Offers Secured</span>
+              <span className="text-sm font-medium">Premium Interview Coaching Platform</span>
             </motion.div>
 
             {/* Main Headline */}
@@ -187,7 +187,7 @@ export default function Home() {
             <FeatureCard
               icon={<Zap className="h-10 w-10" />}
               title="Get Hired Faster"
-              description="94% success rate. Our candidates land offers 3x faster than average job seekers."
+              description="Accelerate your job search with targeted practice and personalized feedback from industry experts."
               gradient="from-purple-500 to-indigo-500"
               delay={0.6}
             />
@@ -210,10 +210,10 @@ export default function Home() {
             className="text-center space-y-4"
           >
             <h2 className="text-4xl md:text-6xl font-bold">
-              Join <span className="text-gradient-gold">10,000+</span> successful candidates
+              Start Your <span className="text-gradient-gold">Success Story</span> Today
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From software engineers to product managers, our community is landing offers at the world's best companies
+              From software engineers to product managers, prepare to land offers at the world's best companies
             </p>
             <div className="pt-8">
               <Link href="/signup">

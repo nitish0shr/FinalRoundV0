@@ -67,21 +67,21 @@ export function EnhancedHero() {
             </motion.div>
             <span className="text-sm font-medium">
               <motion.span
-                key="success-rate"
+                key="platform"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                96% Success Rate
+                Premium Interview Coaching
               </motion.span>
               {" • "}
               <motion.span
-                key="offers"
+                key="tagline"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
               >
-                10,000+ Offers Secured
+                FAANG Experts
               </motion.span>
             </span>
           </motion.div>
@@ -234,7 +234,7 @@ export function EnhancedHero() {
             <SuccessFeedTicker />
           </motion.div>
 
-          {/* Stats Grid */}
+          {/* Features Grid */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -242,9 +242,9 @@ export function EnhancedHero() {
             className="grid grid-cols-3 gap-8 mt-20 max-w-3xl mx-auto"
           >
             {[
-              { value: "10K+", label: "Success Stories" },
-              { value: "96%", label: "Success Rate" },
-              { value: "500+", label: "Elite Experts" }
+              { value: "1:1", label: "Expert Sessions" },
+              { value: "AI", label: "Powered Insights" },
+              { value: "HD", label: "Video Quality" }
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
@@ -254,7 +254,7 @@ export function EnhancedHero() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.8 + idx * 0.1, type: "spring" }}
               >
-                <motion.p 
+                <motion.p
                   className="text-4xl md:text-5xl font-bold text-gradient-violet"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: idx * 0.3 }}

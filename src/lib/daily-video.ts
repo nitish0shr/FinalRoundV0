@@ -3,8 +3,9 @@
 
 export const DAILY_CONFIG = {
   // Get your API key from: https://dashboard.daily.co/
-  apiKey: process.env.NEXT_PUBLIC_DAILY_API_KEY || '',
-  domain: process.env.NEXT_PUBLIC_DAILY_DOMAIN || 'finalround.daily.co',
+  // NOTE: This is a server-side only key - never expose to client
+  apiKey: process.env.DAILY_API_KEY || '',
+  domain: process.env.DAILY_DOMAIN || '',
   
   // Room settings
   roomDefaults: {

@@ -55,17 +55,33 @@ export async function POST(request: NextRequest) {
 
 async function handlePaymentSuccess(paymentIntent: any) {
   const supabase = getSupabaseClient()
+
+  // Update payment status to held (in escrow)
   await supabase
     .from('payments')
     .update({ status: 'held' })
+    .eq('stripe_payment_intent_id', paymentIntent.id)
+
+  // Also update booking status to confirmed
+  await supabase
+    .from('bookings')
+    .update({ status: 'confirmed' })
     .eq('stripe_payment_intent_id', paymentIntent.id)
 }
 
 async function handlePaymentFailure(paymentIntent: any) {
   const supabase = getSupabaseClient()
+
+  // Update payment status to failed
   await supabase
     .from('payments')
     .update({ status: 'failed' })
+    .eq('stripe_payment_intent_id', paymentIntent.id)
+
+  // Also update booking status to cancelled
+  await supabase
+    .from('bookings')
+    .update({ status: 'cancelled' })
     .eq('stripe_payment_intent_id', paymentIntent.id)
 }
 

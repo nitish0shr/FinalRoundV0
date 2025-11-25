@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { releaseEscrowPayment } from '@/lib/stripe-payments'
 
@@ -20,6 +21,12 @@ function getSupabaseClient(): SupabaseClient {
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { sessionId, rating, review, got_offer, offer_company, strengths, weaknesses, resources } = body
 
@@ -35,11 +42,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    const session = sessionData as any
+    const interviewSession = sessionData as any
 
     // Insert or update feedback
     const feedbackData: any = { session_id: sessionId }
-    
+
     if (rating) feedbackData.candidate_rating = rating
     if (review) feedbackData.candidate_review = review
     if (got_offer !== undefined) feedbackData.got_offer = got_offer
@@ -55,14 +62,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     // If this is candidate feedback with rating, release payment to expert
-    if (rating && session.booking?.payment) {
-      const payment = session.booking.payment
-      
+    if (rating && interviewSession.booking?.payment) {
+      const payment = interviewSession.booking.payment
+
       if (payment.status === 'held') {
         // Release funds to expert
         await releaseEscrowPayment({
           paymentIntentId: payment.stripe_payment_intent_id,
-          expertStripeAccountId: session.booking.expert.stripe_account_id,
+          expertStripeAccountId: interviewSession.booking.expert.stripe_account_id,
           amount: Math.round(payment.expert_earnings * 100),
         })
 
@@ -76,7 +83,7 @@ export async function POST(request: NextRequest) {
         await supabase
           .from('earnings')
           .insert({
-            expert_id: session.expert_id,
+            expert_id: interviewSession.expert_id,
             payment_id: payment.id,
             amount: payment.expert_earnings,
             status: 'available',
@@ -87,7 +94,7 @@ export async function POST(request: NextRequest) {
     // Update expert success rate
     if (got_offer === true) {
       await supabase.rpc('update_expert_success_rate', {
-        p_expert_id: session.expert_id
+        p_expert_id: interviewSession.expert_id
       })
     }
 

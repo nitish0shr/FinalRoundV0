@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { getDailyAPI } from '@/lib/daily-video'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
@@ -20,6 +21,12 @@ function getSupabaseClient(): SupabaseClient {
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { bookingId, expertId, candidateId } = body
 
@@ -45,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Save to database
     const supabase = getSupabaseClient()
-    const { data: session } = await supabase
+    const { data: newSession } = await supabase
       .from('sessions')
       .insert({
         booking_id: bookingId,
@@ -59,7 +66,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     return NextResponse.json({
-      sessionId: session.id,
+      sessionId: newSession.id,
       roomUrl: room.url,
       expertToken: expertToken.token,
       candidateToken: candidateToken.token,

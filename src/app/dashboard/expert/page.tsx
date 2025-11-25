@@ -3,19 +3,54 @@
 import { MoneyPrinterDashboard } from "@/components/dashboard/money-printer-dashboard"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import toast from "react-hot-toast"
+import { Loader2, Calendar } from "lucide-react"
+
+interface UpcomingSession {
+  id: string
+  scheduled_at: string
+  booking?: {
+    session_type: string
+    candidate?: {
+      name: string
+    }
+  }
+}
 
 export default function ExpertDashboardPage() {
-  const [earnings] = useState(12500)
-  
-  const expertData = {
-    totalEarnings: earnings,
-    pendingPayouts: 450,
-    thisWeekEarnings: 1250,
-    averageSessionRate: 250,
-    totalSessions: 50,
-    nextPayoutDate: "December 1, 2025"
+  const [loading, setLoading] = useState(true)
+  const [expertData, setExpertData] = useState({
+    totalEarnings: 0,
+    pendingPayouts: 0,
+    thisWeekEarnings: 0,
+    averageSessionRate: 0,
+    totalSessions: 0,
+    nextPayoutDate: ""
+  })
+  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([])
+
+  useEffect(() => {
+    fetchExpertStats()
+  }, [])
+
+  const fetchExpertStats = async () => {
+    try {
+      const response = await fetch('/api/expert/stats')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.stats) {
+          setExpertData(data.stats)
+        }
+        if (data.upcomingSessions) {
+          setUpcomingSessions(data.upcomingSessions)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch expert stats:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleRequestPayout = () => {
@@ -23,6 +58,14 @@ export default function ExpertDashboardPage() {
       icon: "💰",
       duration: 4000
     })
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background to-green-900/10">
+        <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+      </div>
+    )
   }
 
   return (
@@ -46,17 +89,37 @@ export default function ExpertDashboardPage() {
             <CardDescription>Your scheduled coaching sessions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
-                  <div>
-                    <p className="font-medium">Mock Interview - System Design</p>
-                    <p className="text-sm text-muted-foreground">Tomorrow at 2:00 PM</p>
+            {upcomingSessions.length === 0 ? (
+              <div className="py-8 text-center">
+                <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4 opacity-50" />
+                <p className="text-muted-foreground">No upcoming sessions scheduled</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {upcomingSessions.map((session) => (
+                  <div key={session.id} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                    <div>
+                      <p className="font-medium">
+                        {session.booking?.session_type || 'Mock Interview'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {session.scheduled_at
+                          ? new Date(session.scheduled_at).toLocaleString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit'
+                            })
+                          : 'Time TBD'}
+                        {session.booking?.candidate?.name && ` • ${session.booking.candidate.name}`}
+                      </p>
+                    </div>
+                    <Button variant="outline">Join Session</Button>
                   </div>
-                  <Button variant="outline">Join Session</Button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

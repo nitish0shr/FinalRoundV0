@@ -4,105 +4,58 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
-import { Search, Mail, Filter, SlidersHorizontal } from "lucide-react"
-import { useState } from "react"
+import { Search, Mail, SlidersHorizontal } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { ExpertTradingCard, type ExpertData } from "@/components/experts/expert-trading-card"
 import { ExpertCardSkeleton } from "@/components/animated"
 import { AnimatedBackground } from "@/components/animated"
 
-// Mock expert data - replace with real API call
-const mockExperts: ExpertData[] = [
-  {
-    id: "1",
-    name: "Sarah Chen",
-    role: "Senior Software Engineer",
-    company: "Google",
-    yearsExperience: 8,
-    hourlyRate: 250,
-    successRate: 96,
-    totalSessions: 47,
-    avatar: "SC",
-    expertise: ["System Design", "Algorithms", "Behavioral"],
-    verified: true,
-    isElite: true,
-  },
-  {
-    id: "2",
-    name: "Michael Rodriguez",
-    role: "Staff Engineer",
-    company: "Meta",
-    yearsExperience: 10,
-    hourlyRate: 300,
-    successRate: 98,
-    totalSessions: 89,
-    avatar: "MR",
-    expertise: ["Distributed Systems", "Leadership", "Architecture"],
-    verified: true,
-    isElite: true,
-  },
-  {
-    id: "3",
-    name: "Priya Patel",
-    role: "Engineering Manager",
-    company: "Amazon",
-    yearsExperience: 12,
-    hourlyRate: 275,
-    successRate: 92,
-    totalSessions: 63,
-    avatar: "PP",
-    expertise: ["Behavioral", "Leadership", "System Design"],
-    verified: true,
-  },
-  {
-    id: "4",
-    name: "James Wilson",
-    role: "Principal Engineer",
-    company: "Apple",
-    yearsExperience: 15,
-    hourlyRate: 400,
-    successRate: 97,
-    totalSessions: 124,
-    avatar: "JW",
-    expertise: ["iOS", "Mobile Architecture", "System Design"],
-    verified: true,
-    isElite: true,
-  },
-  {
-    id: "5",
-    name: "Elena Martinez",
-    role: "ML Engineer",
-    company: "Netflix",
-    yearsExperience: 9,
-    hourlyRate: 280,
-    successRate: 94,
-    totalSessions: 56,
-    avatar: "EM",
-    expertise: ["Machine Learning", "Python", "Data Structures"],
-    verified: true,
-  },
-  {
-    id: "6",
-    name: "David Kim",
-    role: "Staff SWE",
-    company: "Stripe",
-    yearsExperience: 11,
-    hourlyRate: 320,
-    successRate: 95,
-    totalSessions: 78,
-    avatar: "DK",
-    expertise: ["Backend", "APIs", "System Design"],
-    verified: true,
-  },
-]
-
 export default function ExpertsPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [experts, setExperts] = useState<ExpertData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [showFilters, setShowFilters] = useState(false)
+
+  const fetchExperts = useCallback(async (search?: string) => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (search) params.set('search', search)
+
+      const response = await fetch(`/api/experts?${params.toString()}`)
+      const data = await response.json()
+
+      if (data.experts) {
+        setExperts(data.experts)
+      }
+    } catch (error) {
+      console.error('Failed to fetch experts:', error)
+      toast.error('Failed to load experts')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchExperts()
+  }, [fetchExperts])
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm) {
+        fetchExperts(searchTerm)
+      } else {
+        fetchExperts()
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm, fetchExperts])
 
   const handleEarlyAccess = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,16 +63,16 @@ export default function ExpertsPage() {
       toast.error("Please enter your email")
       return
     }
-    
-    setLoading(true)
+
+    setSubmitting(true)
     await new Promise(resolve => setTimeout(resolve, 1000))
     toast.success("Thanks! We'll notify you when expert booking is live.")
     setEmail("")
-    setLoading(false)
+    setSubmitting(false)
   }
 
-  // Filter experts based on search
-  const filteredExperts = mockExperts.filter(expert =>
+  // Filter experts based on search (client-side backup)
+  const filteredExperts = experts.filter(expert =>
     expert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     expert.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
     expert.expertise.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -145,7 +98,7 @@ export default function ExpertsPage() {
                 transition={{ delay: 0.2, type: "spring" }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 border border-violet-500/30 backdrop-blur-xl"
               >
-                <span className="text-sm font-medium">🎯 1,000+ Elite Experts Available</span>
+                <span className="text-sm font-medium">🎯 Verified Elite Experts</span>
               </motion.div>
 
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
@@ -154,11 +107,11 @@ export default function ExpertsPage() {
                 <br />
                 Interview Coach
               </h1>
-              
+
               <p className="text-xl md:text-2xl text-muted-foreground">
                 Practice with verified experts from FAANG & top companies.
                 <br />
-                <span className="text-green-400 font-semibold">94% success rate</span> • Real experience, real results.
+                <span className="text-green-400 font-semibold">Real experience</span> • Real results.
               </p>
             </div>
 
@@ -219,13 +172,13 @@ export default function ExpertsPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-white/5 border-white/10 backdrop-blur-xl"
                 />
-                <Button 
-                  type="submit" 
-                  disabled={loading}
+                <Button
+                  type="submit"
+                  disabled={submitting}
                   className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white"
                 >
                   <Mail className="mr-2 h-4 w-4" />
-                  {loading ? "Joining..." : "Join Waitlist"}
+                  {submitting ? "Joining..." : "Join Waitlist"}
                 </Button>
               </form>
             </motion.div>

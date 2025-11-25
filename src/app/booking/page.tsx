@@ -2,45 +2,66 @@
 
 import { BookingFlow } from "@/components/booking/booking-flow"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { Loader2 } from "lucide-react"
+
+interface Expert {
+  id: string
+  name: string
+  avatar: string
+  hourlyRate: number
+  calendlyLink?: string
+}
 
 function BookingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const expertId = searchParams.get('expert') || '1'
+  const expertId = searchParams.get('expert')
+  const [expert, setExpert] = useState<Expert | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock expert data - replace with real Supabase query
-  const mockExperts: Record<string, any> = {
-    '1': {
-      id: '1',
-      name: 'Sarah Chen',
-      avatar: 'SC',
-      hourlyRate: 250,
-      calendlyLink: 'https://calendly.com/demo'
-    },
-    '2': {
-      id: '2',
-      name: 'Michael Rodriguez',
-      avatar: 'MR',
-      hourlyRate: 300,
-      calendlyLink: 'https://calendly.com/demo'
+  useEffect(() => {
+    async function fetchExpert() {
+      if (!expertId) {
+        setError('No expert selected')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/experts?id=${expertId}`)
+        const data = await response.json()
+
+        if (data.expert) {
+          setExpert({
+            id: data.expert.id,
+            name: data.expert.name,
+            avatar: data.expert.avatar,
+            hourlyRate: data.expert.hourlyRate,
+            calendlyLink: data.expert.calendlyLink,
+          })
+        } else {
+          setError('Expert not found')
+        }
+      } catch (err) {
+        console.error('Failed to fetch expert:', err)
+        setError('Failed to load expert details')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  const expert = mockExperts[expertId] || mockExperts['1']
+    fetchExpert()
+  }, [expertId])
 
   const handleComplete = async (bookingData: any) => {
-    console.log('Booking completed:', bookingData)
-    
-    // TODO: Save booking to Supabase
-    // await supabase.from('bookings').insert(bookingData)
-    
     toast.success('Booking confirmed! Check your email for session details.', {
       icon: '🎉',
       duration: 5000
     })
-    
+
     // Redirect to dashboard
     setTimeout(() => {
       router.push('/dashboard')
@@ -49,6 +70,28 @@ function BookingContent() {
 
   const handleCancel = () => {
     router.push('/experts')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background to-violet-900/10">
+        <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+      </div>
+    )
+  }
+
+  if (error || !expert) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background via-background to-violet-900/10">
+        <p className="text-lg text-muted-foreground mb-4">{error || 'Expert not found'}</p>
+        <button
+          onClick={() => router.push('/experts')}
+          className="text-violet-400 hover:text-violet-300"
+        >
+          Browse experts
+        </button>
+      </div>
+    )
   }
 
   return (
