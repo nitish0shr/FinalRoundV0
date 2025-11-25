@@ -11,11 +11,33 @@ export const STRIPE_CONFIG = {
   currency: 'usd',
 }
 
-// Initialize Stripe
-export const stripe = new Stripe(STRIPE_CONFIG.secretKey, {
-  apiVersion: '2024-11-20.acacia',
-  typescript: true,
-})
+// Lazy initialization to avoid errors during build
+let stripeClient: Stripe | null = null
+
+function getStripeClient(): Stripe {
+  if (!stripeClient) {
+    if (!STRIPE_CONFIG.secretKey) {
+      throw new Error('Stripe secret key not configured')
+    }
+    stripeClient = new Stripe(STRIPE_CONFIG.secretKey, {
+      apiVersion: '2025-11-17.clover',
+      typescript: true,
+    })
+  }
+  return stripeClient
+}
+
+// Backwards compatible export
+export const stripe = {
+  get accounts() { return getStripeClient().accounts },
+  get accountLinks() { return getStripeClient().accountLinks },
+  get paymentIntents() { return getStripeClient().paymentIntents },
+  get transfers() { return getStripeClient().transfers },
+  get refunds() { return getStripeClient().refunds },
+  get payouts() { return getStripeClient().payouts },
+  get balance() { return getStripeClient().balance },
+  get webhooks() { return getStripeClient().webhooks },
+}
 
 // Payment statuses
 export enum PaymentStatus {

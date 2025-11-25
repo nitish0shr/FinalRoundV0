@@ -1,19 +1,23 @@
 import OpenAI from 'openai'
 import { ParsedJD, GapAnalysis } from '@/types/job'
 
-// Validate API key at module load
-if (!process.env.OPENAI_API_KEY) {
-    console.error('CRITICAL: OPENAI_API_KEY environment variable is not set')
+// Lazy initialization to avoid errors during build
+let openaiClient: OpenAI | null = null
+
+function getOpenAIClient(): OpenAI {
+    if (!openaiClient) {
+        if (!process.env.OPENAI_API_KEY) {
+            throw new Error('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.')
+        }
+        openaiClient = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        })
+    }
+    return openaiClient
 }
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy-key-for-build',
-})
-
 export async function parseJobDescription(jdText: string): Promise<ParsedJD> {
-    if (!process.env.OPENAI_API_KEY) {
-        throw new Error('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.')
-    }
+    const openai = getOpenAIClient()
 
     const prompt = `You are an expert job description parser. Parse the following job description and extract key information in JSON format.
 
@@ -67,9 +71,7 @@ export async function analyzeGap(
     resumeText: string,
     requiredSkills: string[]
 ): Promise<GapAnalysis> {
-    if (!process.env.OPENAI_API_KEY) {
-        throw new Error('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.')
-    }
+    const openai = getOpenAIClient()
 
     const prompt = `You are an expert resume analyzer. Compare the candidate's resume against required job skills and categorize each skill.
 

@@ -1,7 +1,5 @@
 // Global type definitions for FinalRound
 
-import { User } from 'next-auth'
-
 // Extend NextAuth types
 declare module 'next-auth' {
   interface Session {

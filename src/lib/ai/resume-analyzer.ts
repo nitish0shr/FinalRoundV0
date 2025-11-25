@@ -2,12 +2,24 @@
 import OpenAI from 'openai'
 import { ParsedResume, ParsedJobDescription, GapAnalysis } from '@/types'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialization to avoid errors during build
+let openaiClient: OpenAI | null = null
+
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured')
+    }
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return openaiClient
+}
 
 // Parse resume from text
 export async function parseResume(text: string): Promise<ParsedResume> {
+  const openai = getOpenAIClient()
   const completion = await openai.chat.completions.create({
     model: 'gpt-4-turbo',
     messages: [
@@ -59,6 +71,7 @@ export async function analyzeGap(
   resume: ParsedResume,
   jd: ParsedJobDescription
 ): Promise<GapAnalysis> {
+  const openai = getOpenAIClient()
   const completion = await openai.chat.completions.create({
     model: 'gpt-4-turbo',
     messages: [
@@ -111,6 +124,7 @@ export async function generateRoadmap(
   week4: string[]
   resources: Array<{ title: string; url: string; type: string }>
 }> {
+  const openai = getOpenAIClient()
   const completion = await openai.chat.completions.create({
     model: 'gpt-4-turbo',
     messages: [

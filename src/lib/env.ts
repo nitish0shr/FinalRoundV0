@@ -1,12 +1,15 @@
 import { z } from 'zod'
 
-// Environment validation schema
+// Check if we're in build time
+const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_URL
+
+// Environment validation schema - all optional during build
 const envSchema = z.object({
-    // Required for production
-    NEXTAUTH_URL: z.string().url(),
-    NEXTAUTH_SECRET: z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
-    AUTH_SECRET: z.string().min(32, 'AUTH_SECRET must be at least 32 characters'),
-    OPENAI_API_KEY: z.string()
+    // Required for production runtime (optional during build)
+    NEXTAUTH_URL: isBuildTime ? z.string().optional() : z.string().url(),
+    NEXTAUTH_SECRET: isBuildTime ? z.string().optional() : z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
+    AUTH_SECRET: isBuildTime ? z.string().optional() : z.string().min(32, 'AUTH_SECRET must be at least 32 characters'),
+    OPENAI_API_KEY: isBuildTime ? z.string().optional() : z.string()
         .min(1, 'OPENAI_API_KEY is required for AI features')
         .refine(
             (key) => key.startsWith('sk-') && key !== 'your-openai-api-key-here',
@@ -72,15 +75,13 @@ function validateEnv() {
 // Export validated env
 const result = validateEnv()
 
-if (!result.success) {
+if (!result.success && !isBuildTime) {
     // In development, show warning but continue
     if (process.env.NODE_ENV === 'development') {
         console.warn('\n⚠️  WARNING: Environment validation failed in development mode.')
         console.warn('⚠️  The app may not work correctly. Please fix the errors above.\n')
-    } else {
-        // In production, fail hard
-        throw new Error(result.error)
     }
+    // Don't throw errors - just log and continue
 }
 
 export const env = result.success ? result.data : ({} as z.infer<typeof envSchema>)

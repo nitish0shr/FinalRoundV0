@@ -76,9 +76,9 @@ export function AnimatedBackground({ className = "" }: AnimatedBackgroundProps) 
 }
 
 // Floating particles for hero section
-export function FloatingParticles({ count = 20 }: { count?: number }) {
+export function FloatingParticles({ count = 20, className = "" }: { count?: number; className?: string }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
       {Array.from({ length: count }).map((_, i) => (
         <motion.div
           key={i}

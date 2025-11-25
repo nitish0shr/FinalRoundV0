@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDailyAPI } from '@/lib/daily-video'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Lazy initialization to avoid errors during build
+let supabaseClient: SupabaseClient | null = null
+
+function getSupabaseClient(): SupabaseClient {
+  if (!supabaseClient) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Supabase not configured')
+    }
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  }
+  return supabaseClient
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +44,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Save to database
+    const supabase = getSupabaseClient()
     const { data: session } = await supabase
       .from('sessions')
       .insert({

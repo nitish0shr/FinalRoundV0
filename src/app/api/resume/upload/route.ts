@@ -48,11 +48,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Increase payload size limit for file uploads
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-}
+// Route segment config for Next.js App Router
+// Body size is handled automatically by Next.js for FormData
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'

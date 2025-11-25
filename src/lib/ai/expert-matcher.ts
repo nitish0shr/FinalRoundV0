@@ -1,22 +1,43 @@
 // AI Expert Matching Engine
 import OpenAI from 'openai'
 import { ParsedJobDescription, Expert, ExpertMatch, GapAnalysis } from '@/types'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialization to avoid errors during build
+let openaiClient: OpenAI | null = null
+let supabaseClient: SupabaseClient | null = null
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured')
+    }
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return openaiClient
+}
+
+function getSupabaseClient(): SupabaseClient {
+  if (!supabaseClient) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Supabase not configured')
+    }
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  }
+  return supabaseClient
+}
 
 // Match experts to job description
 export async function matchExperts(
   jd: ParsedJobDescription,
   gapAnalysis?: GapAnalysis
 ): Promise<ExpertMatch[]> {
+  const supabase = getSupabaseClient()
   // Get all verified experts
   const { data: experts, error } = await supabase
     .from('experts')
@@ -122,6 +143,7 @@ export async function aiSmartMatch(
   jd: ParsedJobDescription,
   experts: Expert[]
 ): Promise<ExpertMatch[]> {
+  const openai = getOpenAIClient()
   const completion = await openai.chat.completions.create({
     model: 'gpt-4-turbo',
     messages: [

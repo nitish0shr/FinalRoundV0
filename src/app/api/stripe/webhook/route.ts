@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { constructWebhookEvent } from '@/lib/stripe-payments'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Lazy initialization to avoid errors during build
+let supabaseClient: SupabaseClient | null = null
+
+function getSupabaseClient(): SupabaseClient {
+  if (!supabaseClient) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Supabase not configured')
+    }
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  }
+  return supabaseClient
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -18,15 +29,15 @@ export async function POST(request: NextRequest) {
       case 'payment_intent.succeeded':
         await handlePaymentSuccess(event.data.object)
         break
-      
+
       case 'payment_intent.payment_failed':
         await handlePaymentFailure(event.data.object)
         break
-      
+
       case 'transfer.created':
         await handleTransferCreated(event.data.object)
         break
-      
+
       case 'account.updated':
         await handleAccountUpdated(event.data.object)
         break
@@ -43,6 +54,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handlePaymentSuccess(paymentIntent: any) {
+  const supabase = getSupabaseClient()
   await supabase
     .from('payments')
     .update({ status: 'held' })
@@ -50,6 +62,7 @@ async function handlePaymentSuccess(paymentIntent: any) {
 }
 
 async function handlePaymentFailure(paymentIntent: any) {
+  const supabase = getSupabaseClient()
   await supabase
     .from('payments')
     .update({ status: 'failed' })
@@ -57,6 +70,7 @@ async function handlePaymentFailure(paymentIntent: any) {
 }
 
 async function handleTransferCreated(transfer: any) {
+  const supabase = getSupabaseClient()
   await supabase
     .from('payments')
     .update({ status: 'released' })
@@ -64,6 +78,7 @@ async function handleTransferCreated(transfer: any) {
 }
 
 async function handleAccountUpdated(account: any) {
+  const supabase = getSupabaseClient()
   await supabase
     .from('experts')
     .update({
